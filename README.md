@@ -16,40 +16,9 @@ API (JSON):
 		⁃	false - removes only current token
 
 # Launch
-    1. Libraries used MySQL
+    1. Libraries used sqlite
     2. npm install
-    3. Database creation "banda"
-    4. sourse -> Databases -> *.ts write your settings, example:
-                    const connection:any = mysql.createConnection({
-                        host: "localhost",
-                        user: "Vladislav55",
-                        database: "banda",
-                        password: "Vladislav55"
-                    });
-    5. npm start
-
-# database structure
-|users | CRusers | CREATE TABLE `users` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `phone_email` varchar(700) NOT NULL UNIQUE,
-  `password` varchar(700) NOT NULL,
-  `token` varchar(700) NOT NULL,
-  `type_id` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `phone_email` (`phone_email`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
-
-| online | CREATE TABLE `online` (
-  `id_user` varchar(50) NOT NULL UNIQUE,
-  `online` varchar(70) NOT NULL,
-  `lastTime` int NOT NULL,
-  UNIQUE KEY `id_user` (`id_user`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
-
-# MySQL
-mysql.server start
-mysql -u root -p      
-
+    5. npm run start
 
 # inquiries
 
