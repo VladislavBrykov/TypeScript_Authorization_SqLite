@@ -1,7 +1,7 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../Database/database');
+const sequelize = require('../Config/database');
 
-class User extends Model {};
+class User extends Model { };
 
 User.init({
   phone_email: {

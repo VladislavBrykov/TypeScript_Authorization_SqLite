@@ -1,10 +1,10 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../Database/database');
+const sequelize = require('../Config/database');
 
-class Online extends Model {};
+class Online extends Model { };
 
 Online.init({
-id_user: {
+  id_user: {
     type: DataTypes.STRING
   },
   lastTime: {
@@ -18,4 +18,4 @@ id_user: {
 
 module.exports = Online;
 
-export {}
+export { }
