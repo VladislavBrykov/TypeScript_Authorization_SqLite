@@ -1,12 +1,20 @@
-function newToken(): string {
-    let text: string = "";
-    let possible: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+import * as jwt from 'jsonwebtoken'
+const secreKey = '4444';
 
-    for (let i = 0; i < 100; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
+function newTokenCreater(phoneEmail): string {
+    return jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + 600, phoneEmail
+    }, secreKey)
+
 }
 
-module.exports = {
-    newToken: newToken
+function tokenValidator(token) {
+    try {
+        const data = jwt.verify(token, secreKey)
+        return data
+    } catch (error) {
+        return null
+    }
 }
+
+export default { newTokenCreater, tokenValidator }

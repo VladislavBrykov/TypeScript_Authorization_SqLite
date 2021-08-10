@@ -1,10 +1,8 @@
-const { Sequelize } = require('sequelize');
+import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize('test-db', 'user', 'pass', {
+const sequelize = new Sequelize('test-db', 'user', 'passs', {
   dialect: 'sqlite',
   host: './dev.sqlite'
 })
 
-module.exports = sequelize;
-
-export { }
+export default sequelize

@@ -1,4 +1,4 @@
-function typeId(pass: string): string {
+export default function typeId(pass: string): string {
     const arrayPass: RegExpMatchArray = pass.match(/\S/g);
     const searchnum: number = arrayPass.indexOf("@")
 
@@ -10,6 +10,6 @@ function typeId(pass: string): string {
     }
 }
 
-module.exports = {
-    typeId: typeId
-}
+// module.exports = {
+//     typeId: typeId
+// }

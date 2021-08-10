@@ -1,33 +1,37 @@
-async function registration(phoneEmail: string, password: string) {
-    const User = require('../../Models/user.model');
-    const Online = require('../../Models/online.model');
-    const ResTypeid = require("./type.id");
-    const token = require('./new.token');
-    const typeId: string = ResTypeid.typeId(password)
-    const newToken: string = await token.newToken()
+import Online from '../../Models/online.model'
+import User from '../../Models/user.model'
 
-    const sqlite = {
-        "idUser": phoneEmail,
-        "lastTime": "seconds",
-    }
-    await Online.create(sqlite);
+import ResTypeid from './type.id'
+import token from './new.token'
 
-    const sqlite_2 = {
-        "phoneEmail": phoneEmail,
-        "password": password,
-        "token": newToken,
-        "typeId": typeId
+async function registration(phoneEmail: string, password: string): Promise<boolean> {
+    const typeId: string = ResTypeid(password)
+    const newToken: string = token.newTokenCreater(phoneEmail)
+
+    const registrationUser = {
+        phoneEmail,
+        password,
+        token: newToken,
+        typeId
     }
     const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail } })
-
     if (searchUser)
         return false
     else {
-        await User.create(sqlite_2);
+        const createOnline = {
+            idUser: phoneEmail,
+            lastTime: Date.now(),
+        }
+
+        await User.create(registrationUser);
+        await Online.create(createOnline);
+
         return true
     }
 }
 
-module.exports = {
-    registration: registration
-}
+// module.exports = {
+//     registration
+// }
+
+export default registration

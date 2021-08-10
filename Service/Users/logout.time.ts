@@ -1,9 +1,12 @@
-async function logoutTime(phoneEmail: string, newToken: string) {
-    const Online = require('../../Models/online.model');
-    const User = require('../../Models/user.model');
+import Online from '../../Models/online.model'
+import User from '../../Models/user.model'
+
+export default async function logoutTime(phoneEmail: string, newToken: string) {
     const searchUser = await Online.findOne({ where: { id_user: phoneEmail } })
 
     if (searchUser) {
+        console.log(searchUser);
+
         const MS = 1000;
         const tenMin = 600;
         const seconds: number = new Date().getTime() / MS;
@@ -18,8 +21,4 @@ async function logoutTime(phoneEmail: string, newToken: string) {
     }
     else
         return false
-}
-
-module.exports = {
-    logoutTime: logoutTime
 }

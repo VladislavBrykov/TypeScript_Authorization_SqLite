@@ -1,5 +1,6 @@
-async function logout(token: string, all: string) {
-    const User = require('../../Models/user.model');
+import User from '../../Models/user.model'
+
+async function logout(token: string, all: string | string[]) {
     const searchUser = await User.findOne({ where: { token: token } })
 
     if (searchUser) {
@@ -20,6 +21,4 @@ async function logout(token: string, all: string) {
         return false
 }
 
-module.exports = {
-    logout: logout
-}
+export default logout

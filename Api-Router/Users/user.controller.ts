@@ -1,20 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import LatencyMonitor from "latency-monitor";
-
-const sequelize = require("../../Config/database");
-const User = require("../../Models/user.model");
-const Online = require("../../Models/online.model");
-const resultRegistration = require("../../Service/Users/registration");
-const resultLogin = require("../../Service/Users/login");
-const resultInfouser = require("../../Service/Users/users.info");
-const resultLogout = require("../../Service/Users/logout");
-const resultUpdatetime = require("../../Service/Users/update.time");
+import sequelize from "../../Config/database";
+import resultRegistration from '../../Service/Users/registration'
+import resultLogin from '../../Service/Users/login'
+import resultInfouser from '../../Service/Users/users.info'
+import resultLogout from '../../Service/Users/logout'
+import userWithUpdatedToken from '../../Service/Users/update.user.token'
+import resultUpdatetime from '../../Service/Users/update.user.token'
 
 sequelize.sync({ force: true }).then(() => console.log("db is ready"));
 
-const newUser: any = async (req: Request, res: Response, next: NextFunction) => {
+const newUser = async (req: Request, res: Response) => {
     const { password, phoneEmail } = req.body;
-    const resRegistration: boolean = await resultRegistration.registration(phoneEmail, password);
+    const resRegistration: boolean = await resultRegistration(phoneEmail, password);
 
     if (resRegistration) {
         return res.status(200).json({ status: "registration successful" });
@@ -23,9 +21,9 @@ const newUser: any = async (req: Request, res: Response, next: NextFunction) => 
     }
 };
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
+const login = async (req: Request, res: Response) => {
     const { password, phoneEmail } = req.body;
-    const resLogin = await resultLogin.login(phoneEmail, password)
+    const resLogin = await resultLogin(phoneEmail, password)
 
     if (resLogin.length > 10)
         res.status(200).json({ login: "success", resLogin });
@@ -35,7 +33,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
 const infoUser = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
-    const resInfiuser: object = await resultInfouser.infouser(token)
+    const resInfiuser: object = await resultInfouser(token)
 
     if (resInfiuser) {
         return res.status(200).json({ status: true, resInfiuser });
@@ -44,11 +42,11 @@ const infoUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-const logout: any = async (req: Request, res: Response, next: NextFunction) => {
+const logout = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
     const all: string | string[] = req.headers.all;
 
-    const resLogout: boolean = await resultLogout.logout(token, all)
+    const resLogout: boolean = await resultLogout(token, all)
 
     if (resLogout) {
         res.status(200).json({ status: true });
@@ -57,17 +55,18 @@ const logout: any = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
-const latency: any = async (req: Request, res: Response, next: NextFunction) => {
+const latency = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
-    const resLatency: boolean = await resultUpdatetime.updateTime(token)
+    const resLatency = await resultUpdatetime(token)
+    const searchUser = await userWithUpdatedToken(token)
 
-    if (resLatency) {
-        const monitor: any = await new LatencyMonitor();
+    if (resLatency && searchUser) {
+        const monitor = await new LatencyMonitor();
         const time: number = await monitor.latencyCheckIntervalMs;
-        return res.status(200).json({ time });
+        return res.status(200).json({ time, token: searchUser.token });
     }
     else {
-        res.status(200).json({ status: "infouser error" });
+        res.status(200).json({ status: "latency error" });
     }
 };
 
