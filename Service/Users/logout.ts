@@ -1,20 +1,20 @@
 async function logout(token: string, all: string) {
-    const User = require('../../Models/User.model');
-    let res = await User.findOne({ where: { token: token } })
-    if (res) {
+    const User = require('../../Models/user.model');
+    const searchUser = await User.findOne({ where: { token: token } })
+
+    if (searchUser) {
         if (!all) {
             User.update({ token: "0" }, {
                 where: {
                     token: token
                 }
             })
-        }
-        if (all) {
+        } else {
             User.update({ token: "0" }, {
                 where: {}
             })
         }
-        return (true)
+        return true
     }
     else
         return false

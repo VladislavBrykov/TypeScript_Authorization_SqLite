@@ -4,7 +4,7 @@ const sequelize = require('../Config/database');
 class Online extends Model { };
 
 Online.init({
-  id_user: {
+  idUser: {
     type: DataTypes.STRING
   },
   lastTime: {

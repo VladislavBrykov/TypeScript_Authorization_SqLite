@@ -8,5 +8,3 @@ const sequelize = new Sequelize('test-db', 'user', 'pass', {
 module.exports = sequelize;
 
 export { }
-
-///config with object when i by uze password

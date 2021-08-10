@@ -1,30 +1,33 @@
-async function login(phone_email: string, password: string) {
-    const User = require('../../Models/User.model');
-    const Online = require('../../Models/Online.model');
+async function login(phoneEmail: string, password: string) {
+    const User = require('../../Models/user.model');
+    const Online = require('../../Models/online.model');
+    const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail, password: password } })
 
-    let res = await User.findOne({ where: { phone_email: phone_email, password: password } })
-    if (res) {
-        let seconds: number = new Date().getTime() / 1000;
+    if (searchUser) {
+        const MS = 1000;
+        const seconds: number = new Date().getTime() / MS;
         await Online.update({ lastTime: seconds }, {
             where: {
-                id_user: phone_email
+                idUser: phoneEmail
             }
         });
-        let token: any = require('./newToken')
-        let newToken: string = await token.newToken()
+        const token = require('./newToken')
+        const newToken: string = await token.newToken()
 
         await User.update({ token: newToken }, {
             where: {
-                phone_email: phone_email
+                phoneEmail: phoneEmail
             }
         });
         async function func() {
-            const status_online: any = require('./logoutTime');
-            await status_online.logoutTime(phone_email, newToken)
+            const statusOnline = require('./logout.time');
+            await statusOnline.logoutTime(phoneEmail, newToken)
         }
-        await setInterval(func, 600000) //время жизни токена 10 min, после чего юзера вылогинивает если он бездействует
+        const timeMs = 600000;
+        await setInterval(func, timeMs) //время жизни токена 10 min, после чего юзера вылогинивает если он бездействует
         return newToken
     }
+    return ("login error")
 }
 
 module.exports = {

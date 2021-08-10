@@ -4,7 +4,7 @@ const sequelize = require('../Config/database');
 class User extends Model { };
 
 User.init({
-  phone_email: {
+  phoneEmail: {
     type: DataTypes.STRING
   },
   password: {
@@ -13,7 +13,7 @@ User.init({
   token: {
     type: DataTypes.STRING
   },
-  type_id: {
+  typeId: {
     type: DataTypes.STRING
   }
 }, {
