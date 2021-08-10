@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import LatencyMonitor from "latency-monitor";
 
 const sequelize = require("../../Config/database");
-const User = require("../../Models/User.model");
-const Online = require("../../Models/Online.model");
+const User = require("../../Models/user.model");
+const Online = require("../../Models/online.model");
 const resultRegistration = require("../../Service/Users/registration");
 const resultLogin = require("../../Service/Users/login");
 const resultInfouser = require("../../Service/Users/users.info");
