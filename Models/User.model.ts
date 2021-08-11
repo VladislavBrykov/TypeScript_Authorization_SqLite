@@ -1,10 +1,14 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../Config/database');
+import { Model, DataTypes } from 'sequelize'
+import sequelize from '../Config/database'
 
-class User extends Model { };
+class User extends Model {
+  phoneEmail: string
+  typeId: string
+  token: string
+};
 
 User.init({
-  phone_email: {
+  phoneEmail: {
     type: DataTypes.STRING
   },
   password: {
@@ -13,7 +17,7 @@ User.init({
   token: {
     type: DataTypes.STRING
   },
-  type_id: {
+  typeId: {
     type: DataTypes.STRING
   }
 }, {
@@ -22,4 +26,4 @@ User.init({
   timestamps: false
 })
 
-module.exports = User;
+export default User

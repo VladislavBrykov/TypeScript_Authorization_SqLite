@@ -1,10 +1,12 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../Config/database');
+import { Model, DataTypes } from 'sequelize'
+import sequelize from '../Config/database'
 
-class Online extends Model { };
+class Online extends Model {
+  lastTime: number
+};
 
 Online.init({
-  id_user: {
+  idUser: {
     type: DataTypes.STRING
   },
   lastTime: {
@@ -13,9 +15,8 @@ Online.init({
 }, {
   sequelize,
   modelName: 'online',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 })
 
-module.exports = Online;
-
-export { }
+export default Online
