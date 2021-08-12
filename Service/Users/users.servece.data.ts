@@ -1,25 +1,22 @@
 import User from '../../Models/user.model'
+import UserDevice from '../../Models/users.device'
 import tokenCreator from './utils/new.token'
 import ResTypeid from './utils/type.id'
 import token from './utils/new.token'
-import functionHelpers from './utils/service.user.token'
+import functionHelpers from './utils/user.service.helpers'
 
 async function serviceLogin(phoneEmail: string, password: string) {
     const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail, password: password } })
 
     if (searchUser) {
-        const MS = 1000;
-        const seconds: number = new Date().getTime() / MS;
-        const newToken = tokenCreator.newTokenCreater(phoneEmail)
-
-        await User.update({ token: newToken }, {
-            where: {
-                phoneEmail: phoneEmail
-            }
-        });
+        const newToken = await tokenCreator.newTokenCreater(phoneEmail)
+        const newDevice = {
+            phoneEmail,
+            token: newToken,
+        }
+        await UserDevice.create(newDevice);
         return newToken
     }
-
     return ('login error')
 }
 
@@ -43,10 +40,10 @@ async function serviceRegistration(phoneEmail: string, password: string): Promis
 }
 
 async function serviceLogout(token: string, all: boolean) {
-    const searchUser = await User.findOne({ where: { token: token } })
+    const searchUser = await UserDevice.findOne({ where: { token: token } })
 
     if (searchUser) {
-        all ? User.update({ token: "0" }, { where: { token: token } }) : User.update({ token: "0" }, { where: {} })
+        all ? UserDevice.update({ token: null }, { where: { token: token } }) : User.update({ token: null }, { where: { phoneEmail: searchUser.phoneEmail } })
         return true
     }
     else {
@@ -55,16 +52,18 @@ async function serviceLogout(token: string, all: boolean) {
 }
 
 async function serviceInfouser(token: string) {
-    const searchUser = await functionHelpers.userWithUpdatedToken(token)
-
-    if (!searchUser) {
+    const searchUserDvice = await functionHelpers.userWithUpdatedToken(token)
+    if (!searchUserDvice) {
         return { error: 'user not found' }
     }
-
+    const searchUserUniquer = await functionHelpers.searchUserTable(searchUserDvice.phoneEmail)
+    if (!searchUserUniquer) {
+        return { error: 'user not found' }
+    }
     const informationUser = {
-        id: searchUser.phoneEmail,
-        typeId: searchUser.typeId,
-        token: searchUser.token
+        id: searchUserDvice.phoneEmail,
+        typeId: searchUserUniquer.typeId,
+        token: searchUserDvice.token
     }
     return (informationUser)
 }

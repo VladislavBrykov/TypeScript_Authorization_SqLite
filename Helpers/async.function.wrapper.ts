@@ -1,4 +1,4 @@
-export const asyncFunctionWrapper = (callBack) => async (req, res, next) => {
+export const asyncFunctionWrapper = (callBack) => async (req, res) => {
     try {
         await callBack(req, res)
     } catch (error) {

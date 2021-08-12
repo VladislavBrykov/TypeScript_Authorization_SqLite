@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import sequelize from "../../Config/database";
-import functionHelpers from '../../Service/Users/utils/service.user.token'
+import functionHelpers from '../../Service/Users/utils/user.service.helpers'
 import userControllerData from '../../Service/Users/users.servece.data'
 import LatencyMonitor from 'latency-monitor';
 
@@ -29,7 +29,7 @@ const infoUser = async (req: Request, res: Response, next: NextFunction) => {
 const logout = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
     let all = true;
-    req.url.indexOf("true") >= 0 ? all : all = null
+    req.url.indexOf('true') >= 0 ? all : all = null
     const resLogout: boolean = await userControllerData.serviceLogout(token, all)
     return (resLogout ? res.status(200).json({ status: true }) : res.status(200).json({ status: 'token error' }))
 };
