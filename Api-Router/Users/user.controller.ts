@@ -1,73 +1,44 @@
-import { Request, Response, NextFunction } from "express";
-import LatencyMonitor from "latency-monitor";
+import { Request, Response, NextFunction } from 'express';
 import sequelize from "../../Config/database";
-import resultRegistration from '../../Service/Users/registration'
-import resultLogin from '../../Service/Users/login'
-import resultInfouser from '../../Service/Users/users.info'
-import resultLogout from '../../Service/Users/logout'
-import userWithUpdatedToken from '../../Service/Users/update.user.token'
-import resultUpdatetime from '../../Service/Users/update.user.token'
+import functionHelpers from '../../Service/Users/utils/service.user.token'
+import userControllerData from '../../Service/Users/users.servece.data'
+import LatencyMonitor from 'latency-monitor';
 
-sequelize.sync({ force: true }).then(() => console.log("db is ready"));
+const monitor = new LatencyMonitor();
+const time: number = monitor.latencyCheckIntervalMs;
+sequelize.sync({ force: true }).then(() => console.log('db is ready'));
 
-const newUser = async (req: Request, res: Response) => {
+const registration = async (req: Request, res: Response) => {
     const { password, phoneEmail } = req.body;
-    const resRegistration: boolean = await resultRegistration(phoneEmail, password);
-
-    if (resRegistration) {
-        return res.status(200).json({ status: "registration successful" });
-    } else {
-        return res.status(404).json({ status: "registration error^ user exists" });
-    }
+    const resRegistration: boolean = await userControllerData.serviceRegistration(phoneEmail, password);
+    return (resRegistration ? res.status(200).json({ status: 'registration successful' }) : res.status(404).json({ status: 'registration error, user exists' }))
 };
 
 const login = async (req: Request, res: Response) => {
     const { password, phoneEmail } = req.body;
-    const resLogin = await resultLogin(phoneEmail, password)
-
-    if (resLogin.length > 10)
-        res.status(200).json({ login: "success", resLogin });
-    else
-        res.status(200).json({ status: "login error" });
+    const resLogin = await userControllerData.serviceLogin(phoneEmail, password)
+    return (resLogin.length > 10 ? res.status(200).json({ login: 'success', resLogin }) : res.status(200).json({ status: 'login error' }));
 };
 
 const infoUser = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
-    const resInfiuser: object = await resultInfouser(token)
-
-    if (resInfiuser) {
-        return res.status(200).json({ status: true, resInfiuser });
-    } else {
-        return res.status(200).json({ status: "infouser error" });
-    }
+    const resInfiuser: object = await userControllerData.serviceInfouser(token)
+    return (resInfiuser ? res.status(200).json({ status: true, resInfiuser }) : res.status(200).json({ status: 'infouser error' }))
 };
 
 const logout = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
-    const all: string | string[] = req.headers.all;
-
-    const resLogout: boolean = await resultLogout(token, all)
-
-    if (resLogout) {
-        res.status(200).json({ status: true });
-    } else {
-        res.status(200).json({ status: "token error" });
-    }
+    let all = true;
+    req.url.indexOf("true") >= 0 ? all : all = null
+    const resLogout: boolean = await userControllerData.serviceLogout(token, all)
+    return (resLogout ? res.status(200).json({ status: true }) : res.status(200).json({ status: 'token error' }))
 };
 
 const latency = async (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.headers.authorization;
-    const resLatency = await resultUpdatetime(token)
-    const searchUser = await userWithUpdatedToken(token)
-
-    if (resLatency && searchUser) {
-        const monitor = await new LatencyMonitor();
-        const time: number = await monitor.latencyCheckIntervalMs;
-        return res.status(200).json({ time, token: searchUser.token });
-    }
-    else {
-        res.status(200).json({ status: "latency error" });
-    }
+    const searchUser = await functionHelpers.searchUserService(token)
+    const resLatency = await functionHelpers.userWithUpdatedToken(token)
+    return ((resLatency && searchUser) ? res.status(200).json({ time, token: resLatency.token }) : res.status(200).json({ status: 'latency error' }))
 };
 
-export default { newUser, login, logout, infoUser, latency };
+export default { registration, login, logout, infoUser, latency };

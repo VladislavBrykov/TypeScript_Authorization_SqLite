@@ -1,16 +1,15 @@
 import * as jwt from 'jsonwebtoken'
-const secreKey = '4444';
+import constants from '../../../Helpers/constants';
 
 function newTokenCreater(phoneEmail): string {
     return jwt.sign({
-        exp: Math.floor(Date.now() / 1000) + 600, phoneEmail
-    }, secreKey)
-
+        exp: Math.floor(Date.now() / constants.ms) + constants.tenMin, phoneEmail
+    }, constants.secreKey)
 }
 
 function tokenValidator(token) {
     try {
-        const data = jwt.verify(token, secreKey)
+        const data = jwt.verify(token, constants.secreKey)
         return data
     } catch (error) {
         return null
