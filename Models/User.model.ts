@@ -4,7 +4,7 @@ import sequelize from '../Config/database'
 class User extends Model {
   phoneEmail: string
   typeId: string
-  token: string
+  token: object
 };
 
 User.init({
