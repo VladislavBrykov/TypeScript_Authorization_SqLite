@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken';
 import constants from '../../../Helpers/constants';
 
 function newTokenCreater(phoneEmail): string {
@@ -9,11 +9,11 @@ function newTokenCreater(phoneEmail): string {
 
 function tokenValidator(token) {
     try {
-        const data = jwt.verify(token, constants.secreKey)
-        return data
+        const data = jwt.verify(token, constants.secreKey);
+        return data;
     } catch (error) {
-        return null
+        return null;
     }
 }
 
-export default { newTokenCreater, tokenValidator }
+export default { newTokenCreater, tokenValidator };

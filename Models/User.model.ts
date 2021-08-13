@@ -1,10 +1,10 @@
-import { Model, DataTypes } from 'sequelize'
-import sequelize from '../Config/database'
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../Config/database';
 
 class User extends Model {
-  phoneEmail: string
-  typeId: string
-  token: object
+  phoneEmail: string;
+  typeId: string;
+  token: object;
 };
 
 User.init({
@@ -23,7 +23,7 @@ User.init({
 }, {
   sequelize,
   modelName: 'user',
-  timestamps: false
+  timestamps: false,
 })
 
-export default User
+export default User;

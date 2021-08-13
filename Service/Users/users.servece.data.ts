@@ -1,12 +1,12 @@
-import User from '../../Models/user.model'
-import UserDevice from '../../Models/users.device'
-import tokenCreator from './utils/new.token'
-import ResTypeid from './utils/type.id'
-import token from './utils/new.token'
-import functionHelpers from './utils/user.service.helpers'
+import User from '../../Models/user.model';
+import UserDevice from '../../Models/users.device';
+import tokenCreator from './utils/new.token';
+import ResTypeid from './utils/type.id';
+import token from './utils/new.token';
+import functionHelpers from './utils/user.service.helpers';
 
 async function serviceLogin(phoneEmail: string, password: string) {
-    const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail, password: password } })
+    const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail, password: password } });
 
     if (searchUser) {
         const newToken = await tokenCreator.newTokenCreater(phoneEmail)
@@ -15,57 +15,59 @@ async function serviceLogin(phoneEmail: string, password: string) {
             token: newToken,
         }
         await UserDevice.create(newDevice);
-        return newToken
+        return newToken;
     }
-    return ('login error')
+    return ('login error');
 }
 
 async function serviceRegistration(phoneEmail: string, password: string): Promise<boolean> {
-    const typeId: string = ResTypeid(phoneEmail)
-    const newToken: string = token.newTokenCreater(phoneEmail)
+    const typeId: string = ResTypeid(phoneEmail);
+    const newToken: string = token.newTokenCreater(phoneEmail);
 
     const registrationUser = {
         phoneEmail,
         password,
         token: newToken,
-        typeId
+        typeId,
     }
     const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail } })
     if (searchUser)
-        return false
+        return false;
     else {
         await User.create(registrationUser);
-        return true
+        return true;
     }
 }
 
-async function serviceLogout(token: string, all: boolean) {
-    const searchUser = await UserDevice.findOne({ where: { token: token } })
+async function serviceLogout(token: string, all) {
+    const searchUser = await UserDevice.findOne({ where: { token: token } });
 
     if (searchUser) {
-        all ? UserDevice.update({ token: null }, { where: { token: token } }) : User.update({ token: null }, { where: { phoneEmail: searchUser.phoneEmail } })
-        return true
+        all === 'true' ?
+            UserDevice.update({ token: null }, { where: { token: token } }) :
+            UserDevice.update({ token: null }, { where: { phoneEmail: searchUser.phoneEmail } });
+        return true;
     }
     else {
-        return false
+        return false;
     }
 }
 
 async function serviceInfouser(token: string) {
-    const searchUserDvice = await functionHelpers.userWithUpdatedToken(token)
+    const searchUserDvice = await functionHelpers.userWithUpdatedToken(token);
     if (!searchUserDvice) {
-        return { error: 'user not found' }
+        return { error: 'user not found' };
     }
-    const searchUserUniquer = await functionHelpers.searchUserTable(searchUserDvice.phoneEmail)
+    const searchUserUniquer = await functionHelpers.searchUserTable(searchUserDvice.phoneEmail);
     if (!searchUserUniquer) {
-        return { error: 'user not found' }
+        return { error: 'user not found' };
     }
     const informationUser = {
         id: searchUserDvice.phoneEmail,
         typeId: searchUserUniquer.typeId,
-        token: searchUserDvice.token
+        token: searchUserDvice.token,
     }
-    return (informationUser)
+    return (informationUser);
 }
 
 const userControllerData = {
@@ -75,4 +77,4 @@ const userControllerData = {
     serviceInfouser,
 }
 
-export default userControllerData
+export default userControllerData;
