@@ -4,8 +4,11 @@ import tokenCreator from './utils/new.token';
 import ResTypeid from './utils/type.id';
 import token from './utils/new.token';
 import functionHelpers from './utils/user.service.helpers';
+import Users from '../../interfaces'
+import { injectable, inject } from "inversify";
 
-export default class UserService {
+@injectable()
+class UserService implements Users {
     constructor() { }
 
     async serviceLogin(phoneEmail: string, password: string) {
@@ -73,3 +76,5 @@ export default class UserService {
         return (informationUser);
     }
 }
+
+export default UserService
