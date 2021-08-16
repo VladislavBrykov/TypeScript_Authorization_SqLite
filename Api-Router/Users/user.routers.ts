@@ -1,9 +1,11 @@
 import express from 'express';
 import { asyncFunctionWrapper } from '../../Helpers/async.function.wrapper';
 import UserController from './class.user.controlle';
+import UserService from '../../Service/Users/users.servece.data';
 
 const router = express.Router();
-const classUserController = new UserController();
+const userServices = new UserService();
+const classUserController = new UserController(userServices);
 
 router.post('/login', asyncFunctionWrapper(classUserController.login));
 router.get('/info', asyncFunctionWrapper(classUserController.infoUser));

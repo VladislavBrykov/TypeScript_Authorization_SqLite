@@ -14,12 +14,15 @@ sequelize.sync({ force: true }).then(() => console.log('db is ready'));
 
 @injectable()
 class UserController {
+private _userService: UserService;
 
-    @inject(TYPES.Users) private userService: UserService;
+    constructor( @inject(TYPES.Users) userService: UserService ) {
+        this._userService = userService
+    }
 
     registration = async (req: Request, res: Response) => {
         const { password, phoneEmail } = req.body;
-        const resRegistration: boolean = await this.userService.serviceRegistration(phoneEmail, password);
+        const resRegistration: any = await this._userService.serviceRegistration(phoneEmail, password);
         return resRegistration ?
             res.status(200).json({ status: 'registration successful' }) :
             res.status(404).json({ status: 'registration error, user exists' });
@@ -27,7 +30,7 @@ class UserController {
 
     login = async (req: Request, res: Response) => {
         const { password, phoneEmail } = req.body;
-        const resLogin = await this.userService.serviceLogin(phoneEmail, password);
+        const resLogin = await this._userService.serviceLogin(phoneEmail, password);
         return resLogin.length > 10 ?
             res.status(200).json({ login: 'success', resLogin }) :
             res.status(200).json({ status: 'login error' });
@@ -35,7 +38,7 @@ class UserController {
 
     infoUser = async (req: Request, res: Response) => {
         const token: string = req.headers.authorization;
-        const resInfiuser: object = await this.userService.serviceInfouser(token);
+        const resInfiuser: object = await this._userService.serviceInfouser(token);
         return resInfiuser ?
             res.status(200).json({ status: true, resInfiuser }) :
             res.status(200).json({ status: 'infouser error' });
@@ -53,7 +56,7 @@ class UserController {
     logout = async (req: Request, res: Response) => {
         const token: string = req.headers.authorization;
         const all = req.query.all;
-        const resLogout: boolean = await this.userService.serviceLogout(token, all);
+        const resLogout: boolean = await this._userService.serviceLogout(token, all);
         return resLogout ?
             res.status(200).json({ status: true }) :
             res.status(404).json({ status: 'token error' });

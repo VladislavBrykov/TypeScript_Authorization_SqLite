@@ -7,7 +7,7 @@ import functionHelpers from './utils/user.service.helpers';
 import Users from '../../interfaces';
 import { injectable, inject } from "inversify";
 
-@injectable()
+@injectable() 
 class UserService implements Users {
     constructor() { }
 
