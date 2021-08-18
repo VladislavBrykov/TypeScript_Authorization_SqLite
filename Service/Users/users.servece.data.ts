@@ -1,80 +1,91 @@
+import { injectable, inject } from 'inversify';
 import User from '../../Models/user.model';
 import UserDevice from '../../Models/users.device';
 import tokenCreator from './utils/new.token';
 import ResTypeid from './utils/type.id';
-import token from './utils/new.token';
-import functionHelpers from './utils/user.service.helpers';
-import Users from '../../interfaces';
-import { injectable, inject } from "inversify";
+import { Users } from '../../interfaces';
 
-@injectable() 
+@injectable()
 class UserService implements Users {
-    constructor() { }
+  constructor() { }
 
-    async serviceLogin(phoneEmail: string, password: string) {
-        const searchUser = User.findOne({ where: { phoneEmail: phoneEmail, password: password } });
+  async serviceLogin(phoneEmail: string, password: string) {
+    const searchUser = await User.findOne({ where: { phoneEmail, password } });
 
-        if (searchUser) {
-            const newToken = await tokenCreator.newTokenCreater(phoneEmail);
-            const newDevice = {
-                phoneEmail,
-                token: newToken,
-            }
-            await UserDevice.create(newDevice);
-            return newToken;
-        }
-        return ('login error');
+    if (searchUser) {
+      const newToken = await tokenCreator.newTokenCreater(phoneEmail);
+      const newDevice = {
+        phoneEmail,
+        token: newToken,
+      };
+      await UserDevice.create(newDevice);
+      return newToken;
+    }
+    return (false);
+  }
+
+  async serviceRegistration(phoneEmail: string, password: string) {
+    const typeId: string = await ResTypeid(phoneEmail);
+    // eslint-disable-next-line no-undef
+    const newToken: string = await tokenCreator.newTokenCreater(phoneEmail);
+
+    const registrationUser = {
+      phoneEmail,
+      password,
+      token: newToken,
+      typeId,
+    };
+    const searchUser = await User.findOne({ where: { phoneEmail } });
+    if (searchUser) return false;
+
+    await User.create(registrationUser);
+    return true;
+  }
+
+  async serviceLogout(token: string, all:any) {
+    const searchUser = await UserDevice.findOne({ where: { token } });
+
+    if (all === 'true') {
+      await UserDevice.update({ token: null }, { where: { token } });
+    } else {
+      await UserDevice.update(
+        { token: null },
+        { where: { phoneEmail: searchUser.phoneEmail } },
+      );
+    }
+    return true;
+  }
+
+  async serviceDeleteUser(token: string) {
+    const searchUser = await UserDevice.findOne({ where: { token } });
+
+    if (searchUser) {
+      await UserDevice.destroy({ where: { phoneEmail: searchUser.phoneEmail } });
+      await User.destroy({ where: { phoneEmail: searchUser.phoneEmail } });
+
+      return true;
     }
 
-    async serviceRegistration(phoneEmail: string, password: string) {
-        const typeId: string = await ResTypeid(phoneEmail);
-        const newToken: string = await token.newTokenCreater(phoneEmail);
+    return false;
+  }
 
-        const registrationUser = {
-            phoneEmail,
-            password,
-            token: newToken,
-            typeId,
-        }
-        const searchUser = await User.findOne({ where: { phoneEmail: phoneEmail } })
-        if (searchUser)
-            return false;
-        else {
-            await User.create(registrationUser);
-            return true;
-        }
+  async servicePasswordUpdate(
+    phoneEmail: string,
+    password: string,
+    newPassword: string,
+    token: string,
+  ) {
+    const searchUser = User.findOne({ where: { phoneEmail, password } });
+
+    if (searchUser) {
+      const newToken = await tokenCreator.newTokenCreater(phoneEmail);
+      await User.update({ password: newPassword }, { where: { phoneEmail } });
+      await UserDevice.update({ token: newToken }, { where: { token } });
+
+      return newToken;
     }
-
-    async serviceLogout(token: string, all) {
-        const searchUser = await UserDevice.findOne({ where: { token: token } });
-
-        if (searchUser) {
-            all === 'true' ?
-                await UserDevice.update({ token: null }, { where: { token: token } }) :
-                await UserDevice.update({ token: null }, { where: { phoneEmail: searchUser.phoneEmail } });
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    async serviceInfouser(token: string) {
-        const searchUserDvice = await functionHelpers.userWithUpdatedToken(token);
-        if (!searchUserDvice) {
-            return { error: 'user not found' };
-        }
-        const searchUserUniquer = await functionHelpers.searchUserTable(searchUserDvice.phoneEmail);
-        if (!searchUserUniquer) {
-            return { error: 'user not found' };
-        }
-        const informationUser = {
-            id: searchUserDvice.phoneEmail,
-            typeId: searchUserUniquer.typeId,
-            token: searchUserDvice.token,
-        }
-        return (informationUser);
-    }
+    return ('password update error');
+  }
 }
 
-export default UserService
+export default UserService;
