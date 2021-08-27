@@ -2,13 +2,13 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../Config/database';
 
 class UserDevice extends Model {
-  static findOneAndDelete(arg0: { token: null; }, arg1: { where: { token: string; }; }) {
-    throw new Error('Method not implemented.');
-  }
+  // static findOneAndDelete(arg0: { token: null; }, arg1: { where: { token: string; }; }) {
+  //   throw new Error('Method not implemented.');
+  // }
 
-    phoneEmail: string;
+  phoneEmail: string;
 
-    token: string;
+  token: string;
 }
 
 UserDevice.init({
@@ -21,7 +21,7 @@ UserDevice.init({
 }, {
   sequelize,
   modelName: 'userDevice',
-  timestamps: false,
+  // timestamps: false,
 });
 
 export default UserDevice;

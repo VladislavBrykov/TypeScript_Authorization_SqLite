@@ -1,8 +1,8 @@
-import { injectable, inject } from 'inversify';
+import { injectable } from 'inversify';
 import User from '../../Models/user.model';
 import UserDevice from '../../Models/users.device';
-import tokenCreator from './utils/new.token';
-import ResTypeid from './utils/type.id';
+import tokenCreator from './utils/create.new.token';
+import ResTypeid from './utils/find.out.which.id';
 import { Users } from '../../interfaces';
 
 @injectable()
@@ -10,34 +10,41 @@ class UserService implements Users {
   constructor() { }
 
   async serviceLogin(phoneEmail: string, password: string) {
-    const searchUser = await User.findOne({ where: { phoneEmail, password } });
+    const searchUser = await User.findOne({
+      where: { phoneEmail, password },
+      attributes: ['phoneEmail', 'typeId', 'role'],
+    });
 
     if (searchUser) {
-      const newToken = await tokenCreator.newTokenCreater(phoneEmail);
+      const newToken = tokenCreator.newTokenCreater(phoneEmail);
       const newDevice = {
         phoneEmail,
         token: newToken,
       };
       await UserDevice.create(newDevice);
-      return newToken;
+      return {
+        newToken,
+        searchUser,
+      };
     }
-    return (false);
+    return false;
   }
 
   async serviceRegistration(phoneEmail: string, password: string) {
-    const typeId: string = await ResTypeid(phoneEmail);
-    // eslint-disable-next-line no-undef
-    const newToken: string = await tokenCreator.newTokenCreater(phoneEmail);
+    const typeId: string = ResTypeid(phoneEmail);
+    const newToken: string = tokenCreator.newTokenCreater(phoneEmail);
 
     const registrationUser = {
       phoneEmail,
       password,
       token: newToken,
       typeId,
+      role: 'admin',
     };
     const searchUser = await User.findOne({ where: { phoneEmail } });
-    if (searchUser) return false;
-
+    if (searchUser) {
+      return false;
+    }
     await User.create(registrationUser);
     return true;
   }
@@ -58,14 +65,24 @@ class UserService implements Users {
 
   async serviceDeleteUser(token: string) {
     const searchUser = await UserDevice.findOne({ where: { token } });
-
     if (searchUser) {
       await UserDevice.destroy({ where: { phoneEmail: searchUser.phoneEmail } });
       await User.destroy({ where: { phoneEmail: searchUser.phoneEmail } });
-
       return true;
     }
+    return false;
+  }
 
+  async serviceDeleteUserByAdmin(phoneEmail: string) {
+    const searchUser = await User.findOne({
+      where: { phoneEmail },
+      attributes: ['role'],
+    });
+    if (searchUser.getDataValue('role') === 'admin') {
+      await UserDevice.destroy({ where: { phoneEmail } });
+      await User.destroy({ where: { phoneEmail } });
+      return true;
+    }
     return false;
   }
 
@@ -78,13 +95,13 @@ class UserService implements Users {
     const searchUser = User.findOne({ where: { phoneEmail, password } });
 
     if (searchUser) {
-      const newToken = await tokenCreator.newTokenCreater(phoneEmail);
+      const newToken = tokenCreator.newTokenCreater(phoneEmail);
       await User.update({ password: newPassword }, { where: { phoneEmail } });
       await UserDevice.update({ token: newToken }, { where: { token } });
 
-      return newToken;
+      return { status: true, token: newToken };
     }
-    return ('password update error');
+    return { status: false, error: 'password update error' };
   }
 }
 
