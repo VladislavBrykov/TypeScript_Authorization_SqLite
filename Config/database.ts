@@ -1,8 +1,9 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize('test-db', 'user', 'passs', {
-  dialect: 'sqlite',
-  host: './dev.sqlite'
-})
+const sequelize = new Sequelize('postgres', 'user', 'password', {
+  host: 'localhost',
+  dialect: 'postgres',
+  storage: 'path/to/database.postgres',
+});
 
-export default sequelize
+export default sequelize;

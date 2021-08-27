@@ -1,27 +1,28 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../Config/database';
 
-class User extends Model {}
+class Comments extends Model {}
 
-User.init({
+Comments.init({
+  typeAction: {
+    type: DataTypes.STRING,
+    unique: false,
+  },
   phoneEmail: {
     type: DataTypes.STRING,
+    unique: false,
   },
-  password: {
+  idToDo: {
     type: DataTypes.STRING,
+    unique: false,
   },
-  token: {
+  bodyComment: {
     type: DataTypes.STRING,
-  },
-  typeId: {
-    type: DataTypes.STRING,
-  },
-  role: {
-    type: DataTypes.STRING,
+    unique: false,
   },
 }, {
   sequelize,
-  modelName: 'user',
+  modelName: 'comments',
 });
 
-export default User;
+export default Comments;

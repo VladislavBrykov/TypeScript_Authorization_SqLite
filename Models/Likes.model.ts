@@ -1,27 +1,28 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../Config/database';
 
-class User extends Model {}
+class Likes extends Model {}
 
-User.init({
+Likes.init({
+  typeActionPostComment: {
+    type: DataTypes.STRING,
+    unique: false,
+  },
+  idPostComment: {
+    type: DataTypes.STRING,
+    unique: false,
+  },
   phoneEmail: {
     type: DataTypes.STRING,
+    unique: false,
   },
-  password: {
+  likeDislike: {
     type: DataTypes.STRING,
-  },
-  token: {
-    type: DataTypes.STRING,
-  },
-  typeId: {
-    type: DataTypes.STRING,
-  },
-  role: {
-    type: DataTypes.STRING,
+    unique: false,
   },
 }, {
   sequelize,
-  modelName: 'user',
+  modelName: 'likes',
 });
 
-export default User;
+export default Likes;
