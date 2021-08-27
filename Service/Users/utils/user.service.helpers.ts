@@ -1,6 +1,6 @@
-import UserDevice from '../../../Models/users.device';
+import UserDevice from '../../../Models/Users.Device.model';
 import User from '../../../Models/user.model';
-import tokenService from './new.token';
+import tokenService from './create.new.token';
 
 function updateTokenUserById(nameObject, newToken, data) {
   nameObject.update({ token: newToken }, {
@@ -28,8 +28,14 @@ async function userWithUpdatedToken(token: string) {
 }
 
 async function searchUserService(token: string) {
-  const searchUser = await UserDevice.findOne({ where: { token } });
-  return (searchUser || false);
+  const searchUser = await UserDevice.findOne({
+    where: { token },
+    attributes: ['phoneEmail'],
+  });
+  if (searchUser) {
+    return searchUser.getDataValue('phoneEmail');
+  }
+  return false;
 }
 
 async function searchUserTable(phoneEmail: string) {

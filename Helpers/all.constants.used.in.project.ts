@@ -1,11 +1,11 @@
 const ms = 1000;
 const tenMin = 600;
-const secreKey = '4444';
+const secretKey = '4444';
 
-const constants = {
+const allConstantsUsedInProject = {
   ms,
   tenMin,
-  secreKey,
+  secretKey,
 };
 
-export default constants;
+export default allConstantsUsedInProject;

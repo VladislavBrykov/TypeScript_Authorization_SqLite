@@ -1,36 +1,28 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../Config/database';
 
-class Post extends Model {}
+class Likes extends Model {}
 
-Post.init({
+Likes.init({
+  typeActionPostComment: {
+    type: DataTypes.STRING,
+    unique: false,
+  },
+  idPostComment: {
+    type: DataTypes.STRING,
+    unique: false,
+  },
   phoneEmail: {
     type: DataTypes.STRING,
     unique: false,
   },
-  title: {
-    type: DataTypes.STRING,
-    unique: false,
-  },
-  body: {
-    type: DataTypes.STRING,
-    unique: false,
-  },
-  image: {
-    type: DataTypes.STRING,
-    unique: false,
-  },
-  countLikes: {
-    type: DataTypes.STRING,
-    unique: false,
-  },
-  countComments: {
+  likeDislike: {
     type: DataTypes.STRING,
     unique: false,
   },
 }, {
   sequelize,
-  modelName: 'posts',
+  modelName: 'likes',
 });
 
-export default Post;
+export default Likes;

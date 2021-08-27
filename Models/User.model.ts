@@ -1,13 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../Config/database';
 
-class User extends Model {
-  phoneEmail: string;
-
-  typeId: string;
-
-  token: object;
-}
+class User extends Model {}
 
 User.init({
   phoneEmail: {
@@ -22,10 +16,12 @@ User.init({
   typeId: {
     type: DataTypes.STRING,
   },
+  role: {
+    type: DataTypes.STRING,
+  },
 }, {
   sequelize,
   modelName: 'user',
-  timestamps: false,
 });
 
 export default User;

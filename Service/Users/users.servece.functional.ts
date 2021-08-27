@@ -1,15 +1,16 @@
 import { injectable } from 'inversify';
 import User from '../../Models/user.model';
-import UserDevice from '../../Models/users.device';
+import UserDevice from '../../Models/Users.Device.model';
 import tokenCreator from './utils/create.new.token';
 import ResTypeid from './utils/find.out.which.id';
 import { Users } from '../../interfaces';
+import userRoot from '../Posts/utils/root.user';
 
 @injectable()
 class UserService implements Users {
   constructor() { }
 
-  async serviceLogin(phoneEmail: string, password: string) {
+  async serviceLogin(phoneEmail: string, password: string) :Promise<any> {
     const searchUser = await User.findOne({
       where: { phoneEmail, password },
       attributes: ['phoneEmail', 'typeId', 'role'],
@@ -18,7 +19,7 @@ class UserService implements Users {
     if (searchUser) {
       const newToken = tokenCreator.newTokenCreater(phoneEmail);
       const newDevice = {
-        phoneEmail,
+        phoneEmail: searchUser.getDataValue('phoneEmail'),
         token: newToken,
       };
       await UserDevice.create(newDevice);
@@ -30,7 +31,7 @@ class UserService implements Users {
     return false;
   }
 
-  async serviceRegistration(phoneEmail: string, password: string) {
+  async serviceRegistration(phoneEmail: string, password: string) :Promise<any> {
     const typeId: string = ResTypeid(phoneEmail);
     const newToken: string = tokenCreator.newTokenCreater(phoneEmail);
 
@@ -49,7 +50,7 @@ class UserService implements Users {
     return true;
   }
 
-  async serviceLogout(token: string, all:any) {
+  async serviceLogout(token: string, all:any) :Promise<any> {
     const searchUser = await UserDevice.findOne({ where: { token } });
 
     if (all === 'true') {
@@ -63,7 +64,7 @@ class UserService implements Users {
     return true;
   }
 
-  async serviceDeleteUser(token: string) {
+  async serviceDeleteUser(token: string) :Promise<any> {
     const searchUser = await UserDevice.findOne({ where: { token } });
     if (searchUser) {
       await UserDevice.destroy({ where: { phoneEmail: searchUser.phoneEmail } });
@@ -73,12 +74,8 @@ class UserService implements Users {
     return false;
   }
 
-  async serviceDeleteUserByAdmin(phoneEmail: string) {
-    const searchUser = await User.findOne({
-      where: { phoneEmail },
-      attributes: ['role'],
-    });
-    if (searchUser.getDataValue('role') === 'admin') {
+  async serviceDeleteUserByAdmin(phoneEmail: string) :Promise<any> {
+    if (await userRoot.userRootById(phoneEmail) === 'admin') {
       await UserDevice.destroy({ where: { phoneEmail } });
       await User.destroy({ where: { phoneEmail } });
       return true;
@@ -91,9 +88,9 @@ class UserService implements Users {
     password: string,
     newPassword: string,
     token: string,
-  ) {
+  ) :Promise<any> {
     const searchUser = User.findOne({ where: { phoneEmail, password } });
-
+    console.log('----------------------', newPassword);
     if (searchUser) {
       const newToken = tokenCreator.newTokenCreater(phoneEmail);
       await User.update({ password: newPassword }, { where: { phoneEmail } });

@@ -3,6 +3,6 @@ export const asyncFunctionWrapper = (callBack) => async (req, res) => {
     await callBack(req, res);
   } catch (error) {
     console.log(error);
-    res.status(500).send('server error');
+    res.status(500).send('the server encountered an unknown error');
   }
 };

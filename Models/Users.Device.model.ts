@@ -2,10 +2,6 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../Config/database';
 
 class UserDevice extends Model {
-  // static findOneAndDelete(arg0: { token: null; }, arg1: { where: { token: string; }; }) {
-  //   throw new Error('Method not implemented.');
-  // }
-
   phoneEmail: string;
 
   token: string;
@@ -20,8 +16,7 @@ UserDevice.init({
   },
 }, {
   sequelize,
-  modelName: 'userDevice',
-  // timestamps: false,
+  modelName: 'devices',
 });
 
 export default UserDevice;
